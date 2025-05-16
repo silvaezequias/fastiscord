@@ -1,6 +1,6 @@
 {
   "name": "fastiscord",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Fastiscord is a lightweight Discord.js handler that speeds up bot development by automatically loading commands and events from files following a simple naming convention. With built-in CLI support, Fastiscord helps you set up, register, and run your bot effortlessly.",
   "main": "dist/index.js",
   "bin": {
@@ -14,8 +14,16 @@
     "handler",
     "bot"
   ],
-  "author": "",
+  "author": "Ezequias Silva <silvaezequias@example.com>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/silvaezequias/fastiscord.git"
+  },
+  "bugs": {
+    "url": "https://github.com/silvaezequias/fastiscord/issues"
+  },
+  "homepage": "https://github.com/silvaezequias/fastiscord#readme",
   "dependencies": {
     "discord.js": "^14.19.3",
     "inquirer": "^12.6.1",
