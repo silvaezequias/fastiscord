@@ -1,0 +1,29 @@
+{
+  "name": "fastiscord",
+  "version": "1.0.1",
+  "description": "Fastiscord is a lightweight Discord.js handler that speeds up bot development by automatically loading commands and events from files following a simple naming convention. With built-in CLI support, Fastiscord helps you set up, register, and run your bot effortlessly.",
+  "main": "dist/index.js",
+  "bin": {
+    "fastiscord": "./dist/bin/index.js"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "discord.js",
+    "handler",
+    "bot"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.19.3",
+    "inquirer": "^12.6.1",
+    "dotenv": "^16.5.0",
+    "glob": "^11.0.2",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
