@@ -1,37 +1,41 @@
 {
-  "name": "fastiscord",
-  "version": "1.0.2",
-  "description": "Fastiscord is a lightweight Discord.js handler that speeds up bot development by automatically loading commands and events from files following a simple naming convention. With built-in CLI support, Fastiscord helps you set up, register, and run your bot effortlessly.",
-  "main": "dist/index.js",
+  "name": "fastiscord-ts",
+  "version": "1.0.0",
+  "description": "Fastiscord is a lightweight TypeScript-first Discord.js handler that speeds up bot development by automatically loading commands and events from files following a simple naming convention. With built-in CLI support, Fastiscord helps you set up, register, and run your bot effortlessly using a structured and type-safe workflow.",
+  "main": "src/index.ts",
   "bin": {
-    "fastiscord": "./dist/bin/index.js"
+    "fastiscord-ts": "./dist/bin/index.js"
   },
   "scripts": {
-    "build": "tsc"
+    "build:bin": "tsc"
   },
   "keywords": [
     "discord.js",
     "handler",
     "bot"
   ],
-  "author": "Ezequias Silva <silvaezequias@example.com>",
+  "author": "Ezequias Silva <silvaezequias@gmail.com>",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/silvaezequias/fastiscord.git"
+    "url": "https://github.com/silvaezequias/fastiscord-ts.git"
   },
   "bugs": {
-    "url": "https://github.com/silvaezequias/fastiscord/issues"
+    "url": "https://github.com/silvaezequias/fastiscord-ts/issues"
   },
-  "homepage": "https://github.com/silvaezequias/fastiscord#readme",
+  "homepage": "https://github.com/silvaezequias/fastiscord-ts#readme",
   "dependencies": {
+    "colorette": "^2.0.20",
+    "commander": "^14.0.0",
     "discord.js": "^14.19.3",
-    "inquirer": "^12.6.1",
     "dotenv": "^16.5.0",
+    "fs-extra": "^11.3.0",
     "glob": "^11.0.2",
+    "inquirer": "^12.6.1",
     "zod": "^3.24.4"
   },
   "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
     "typescript": "^5.8.3"
   }
 }

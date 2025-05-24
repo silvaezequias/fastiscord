@@ -1,8 +1,9 @@
 import inquirer from "inquirer";
 import fs from "fs/promises";
 import path from "path";
+import { installDependencies } from "./deps";
 
-const CONFIG_FILENAME = "fastiscord.config.json";
+const CONFIG_FILENAME = "fastiscord-ts.config.json";
 const ENV_FILENAME = ".env";
 
 const DEFAULT_CONFIG = {
@@ -16,24 +17,80 @@ const REQUIRED_ENV_VARS = [
   "DISCORD_GUILD_ID",
 ];
 
-export async function runInit(skipPrompts = false) {
-  printWelcomeMessage();
-  const config = await setupConfig(skipPrompts);
-  await writeConfigFile(config);
-  await ensureEnvVariables();
-  printEnvExplanation();
-}
+type RunInitOptions = {
+  path?: string;
+  withTemplate: boolean;
+  skipPrompts: boolean;
+};
 
-// === Helpers ===
+export async function runInit({
+  path: initialPath,
+  withTemplate: initialWithTemplate,
+  skipPrompts,
+}: RunInitOptions) {
+  printWelcomeMessage();
+
+  const config = await setupConfig(
+    skipPrompts,
+    initialPath,
+    initialWithTemplate
+  );
+
+  await fs.mkdir(config.path, { recursive: true });
+
+  const commandFilePattern = config.commandFilePattern.replace(
+    /@root/g,
+    config.path
+  );
+  const eventFilePattern = config.eventFilePattern.replace(
+    /@root/g,
+    config.path
+  );
+
+  await writeConfigFile(config.path, {
+    commandFilePattern,
+    eventFilePattern,
+  });
+
+  await ensureEnvVariables(config.path);
+
+  if (config.withTemplate) {
+    await copyTemplateTo(config.path);
+  }
+
+  printEnvExplanation();
+  await installDependencies(config.path);
+}
 
 function printWelcomeMessage() {
-  console.log("\n✨ Welcome to Fastiscord Config Init!\n");
+  console.log("\n✨ Welcome to Fastiscord for Typescript Config Init!\n");
 }
 
-async function setupConfig(skipPrompts: boolean) {
-  if (skipPrompts) return DEFAULT_CONFIG;
+async function setupConfig(
+  skipPrompts: boolean,
+  initialPath?: string,
+  initialWithTemplate?: boolean
+) {
+  if (skipPrompts)
+    return {
+      path: initialPath ?? process.cwd(),
+      withTemplate: initialWithTemplate ?? true,
+      ...DEFAULT_CONFIG,
+    };
 
   const answers = await inquirer.prompt([
+    {
+      type: "input",
+      name: "path",
+      message: "Enter the project directory path:",
+      default: initialPath ?? process.cwd(),
+    },
+    {
+      type: "confirm",
+      name: "withTemplate",
+      message: "Do you want to add the template files?",
+      default: initialWithTemplate ?? true,
+    },
     {
       type: "input",
       name: "commandFilePattern",
@@ -49,19 +106,24 @@ async function setupConfig(skipPrompts: boolean) {
   ]);
 
   return {
+    path: answers.path,
+    withTemplate: answers.withTemplate,
     commandFilePattern: answers.commandFilePattern,
     eventFilePattern: answers.eventFilePattern,
   };
 }
 
-async function writeConfigFile(config: Record<string, string>) {
-  const configPath = path.join(process.cwd(), CONFIG_FILENAME);
+async function writeConfigFile(
+  projectPath: string,
+  config: Record<string, string>
+) {
+  const configPath = path.join(projectPath, CONFIG_FILENAME);
   await fs.writeFile(configPath, JSON.stringify(config, null, 2));
   console.log(`✅ Created '${CONFIG_FILENAME}'`);
 }
 
-async function ensureEnvVariables() {
-  const envPath = path.join(process.cwd(), ENV_FILENAME);
+async function ensureEnvVariables(projectPath: string) {
+  const envPath = path.join(projectPath, ENV_FILENAME);
 
   let content = "";
   let fileExists = true;
@@ -123,4 +185,12 @@ function printEnvExplanation() {
   console.log(
     `  DISCORD_GUILD_ID   → (Optional) Guild ID for testing/dev command registration\n`
   );
+}
+
+async function copyTemplateTo(destination: string) {
+  const fse = await import("fs-extra");
+  const templatePath = path.resolve(__dirname, "../../src/template");
+
+  await fse.copy(templatePath, destination, { overwrite: true });
+  console.log(`📦 Template files copied to ${destination}`);
 }

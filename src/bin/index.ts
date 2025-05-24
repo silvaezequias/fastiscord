@@ -1,29 +1,33 @@
 #!/usr/bin/env node
+import { Command } from "commander";
 import path from "path";
 import fs from "fs";
 
-const args = process.argv.slice(2);
-const command = args[0] || "init";
+const program = new Command();
 
-const skipPrompts = args.includes("-y");
+program
+  .name("fastiscord-ts")
+  .description("Fastiscord CLI - Quickly bootstrap your Discord.js bot project")
+  .version(getVersion(), "-v, --version", "Display CLI version");
 
-switch (command) {
-  case "-y":
-  case "init":
-    import("./init").then((m) => m.runInit(skipPrompts));
-    break;
+program
+  .command("init [path]")
+  .option("-t, --template", "include template files", true)
+  .option("-s, --skip-prompts", "skip all prompts", false)
+  .action(async (pathArg, options) => {
+    const { runInit } = await import("./init");
 
-  case "version":
-  case "v": {
-    const packagePath = path.resolve(__dirname, "../../package.json");
-    const pkg = JSON.parse(fs.readFileSync(packagePath, "utf-8"));
-    console.log(`fastiscord version: ${pkg.version}`);
-    break;
-  }
+    await runInit({
+      path: pathArg,
+      withTemplate: options.template,
+      skipPrompts: options.skipPrompts,
+    });
+  });
 
-  default:
-    console.log("❌ Unknown command. Available commands:");
-    console.log("  npx fastiscord init [-y]");
-    console.log("  npx fastiscord version");
-    process.exit(1);
+program.parse(process.argv);
+
+function getVersion(): string {
+  const packagePath = path.resolve(__dirname, "../../package.json");
+  const pkg = JSON.parse(fs.readFileSync(packagePath, "utf-8"));
+  return pkg.version;
 }
